@@ -1,2 +1,3 @@
-# barberbalance
-Barber Balance App
+the barba
+barber calculator
+barberscript
