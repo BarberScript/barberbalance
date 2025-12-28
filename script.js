@@ -8,8 +8,6 @@ function showError() {
   });
 }
 
-
-
 async function calculateSalary() {
   const sumInput = document.getElementById("sum").value;
   const hoursInput = document.getElementById("hours").value;
@@ -70,7 +68,7 @@ async function calculateSalary() {
     hourlySalary,
     additionalResult,
     additionalBrut,
-    additionalNalog,
+    additionalNalog
   );
   await fetchResults();
 
@@ -110,9 +108,7 @@ async function displayResults() {
     // Вывод почасовой зарплаты для второй записи
     if (data.length >= 2) {
       const firstEntry = data[1];
-      const firstHourlySalary = (
-        firstEntry.bigtotal / firstEntry.hours
-      ).toFixed(2);
+      const firstHourlySalary = (firstEntry.bigtotal / firstEntry.hours).toFixed(2);
       hourlySalaryResult2.textContent = `${firstHourlySalary}`;
     }
 
@@ -183,23 +179,30 @@ async function displayResults() {
 }
 
 function createChart(results) {
-  const labels = results.map(
-    (result) => new Date(result.date).toLocaleDateString()
+  // 1. Ограничиваем количество результатов до 10 последних
+  // Если в массиве меньше 10 элементов, возьмутся все имеющиеся
+  const limitedResults = results.slice(-10);
+
+  const labels = limitedResults.map((result) =>
+    new Date(result.date).toLocaleDateString()
   );
-  const data = results.map((result) =>
+
+  const data = limitedResults.map((result) =>
     result.result ? result.result.toFixed(2) : 0
   );
 
   const ctx = document.getElementById("myChart").getContext("2d");
 
-  // Create gradient
+  // Создаем градиент
   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, 'rgba(0, 243, 255, 0.5)');
-  gradient.addColorStop(1, 'rgba(0, 243, 255, 0)');
+  gradient.addColorStop(0, "rgba(0, 243, 255, 0.5)");
+  gradient.addColorStop(1, "rgba(0, 243, 255, 0)");
 
+  // Очистка старого графика перед созданием нового
   if (typeof myChart === "object" && myChart !== null) {
     myChart.destroy();
   }
+
   myChart = new Chart(ctx, {
     type: "line",
     data: {
@@ -211,12 +214,12 @@ function createChart(results) {
           fill: true,
           backgroundColor: gradient,
           tension: 0.4,
-          borderColor: "#00f3ff", // Cyan
+          borderColor: "#00f3ff",
           borderWidth: 2,
           pointRadius: 4,
           pointBackgroundColor: "#fff",
           pointBorderColor: "#00f3ff",
-        }
+        },
       ],
     },
     options: {
@@ -224,29 +227,27 @@ function createChart(results) {
       maintainAspectRatio: false,
       scales: {
         y: {
+          display: false, // Убирает цифры и саму ось слева
           beginAtZero: true,
-          display: true, // Show Y axis for value context
-          grid: { color: "rgba(255, 255, 255, 0.05)" },
-          ticks: { color: "rgba(255, 255, 255, 0.5)" }
         },
         x: {
-          display: false, // Hide X axis labels to keep it clean
+          display: false, // Убирает даты внизу для чистоты интерфейса
           grid: { display: false },
         },
       },
       plugins: {
         legend: {
-          display: false, // Hide legend since it's just one line
+          display: false, // Скрывает название набора данных
         },
         tooltip: {
-          mode: 'index',
+          mode: "index",
           intersect: false,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-          borderWidth: 1
-        }
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          borderColor: "rgba(255, 255, 255, 0.2)",
+          borderWidth: 1,
+        },
       },
     },
   });
@@ -290,12 +291,16 @@ function calculateStats(data) {
 
   if (bestWeek) {
     document.getElementById("bestWeek").textContent = `$${maxResult.toFixed(2)}`;
-    document.getElementById("bestWeekDate").textContent = new Date(bestWeek.date).toLocaleDateString();
+    document.getElementById("bestWeekDate").textContent = new Date(
+      bestWeek.date
+    ).toLocaleDateString();
   }
 
   if (worstWeek) {
     document.getElementById("worstWeek").textContent = `$${minResult.toFixed(2)}`;
-    document.getElementById("worstWeekDate").textContent = new Date(worstWeek.date).toLocaleDateString();
+    document.getElementById("worstWeekDate").textContent = new Date(
+      worstWeek.date
+    ).toLocaleDateString();
   }
 
   // Vacation Recommendation (Lowest Average Month)
@@ -334,9 +339,13 @@ function calculateStats(data) {
     const trendElement = document.getElementById("profitTrend");
 
     if (diff > 0) {
-      trendElement.innerHTML = `+$${diff.toFixed(2)} <span style="color: #00ff9d;">&#8593;</span>`;
+      trendElement.innerHTML = `+$${diff.toFixed(
+        2
+      )} <span style="color: #00ff9d;">&#8593;</span>`;
     } else if (diff < 0) {
-      trendElement.innerHTML = `-$${Math.abs(diff).toFixed(2)} <span style="color: #ff4d4d;">&#8595;</span>`;
+      trendElement.innerHTML = `-$${Math.abs(diff).toFixed(
+        2
+      )} <span style="color: #ff4d4d;">&#8595;</span>`;
     } else {
       trendElement.innerHTML = `$0.00 <span>-</span>`;
     }
